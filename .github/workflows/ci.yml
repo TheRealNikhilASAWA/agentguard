@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run tests
+        run: make test
+      - name: Build image (includes test suite)
+        run: docker build -t agentguard:ci .
+      - name: Smoke-test container
+        run: |
+          set -eu
+          docker run -d --rm --name agentguard-ci -p 127.0.0.1:8000:8000 agentguard:ci
+          trap 'docker stop agentguard-ci' EXIT
+          for attempt in $(seq 1 20); do
+            curl --fail --silent http://127.0.0.1:8000/health && break
+            sleep 1
+          done
+          curl --fail --silent -X POST http://127.0.0.1:8000/tool-call \
+            -H 'content-type: application/json' \
+            -d '{"tool":"bash_execute","arguments":{"command":"rm -rf /"}}' \
+            | python -c "import json,sys; assert json.load(sys.stdin)['decision'] == 'BLOCK'"

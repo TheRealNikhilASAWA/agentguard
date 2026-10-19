@@ -1,9 +1,8 @@
-import json
 import os
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -14,6 +13,7 @@ from .models import ToolCall
 from .policy import load_policy
 
 POLICY_PATH = Path(os.environ.get("AGENTGUARD_POLICY_PATH", Path(__file__).parents[2] / "policy" / "default.yaml"))
+MAX_BODY_SIZE = int(os.environ.get("AGENTGUARD_MAX_BODY_SIZE", str(1024 * 1024)))
 policy = load_policy(POLICY_PATH)
 app = FastAPI(title="AgentGuard", version=__version__)
 
@@ -21,7 +21,7 @@ app = FastAPI(title="AgentGuard", version=__version__)
 @app.middleware("http")
 async def request_size_limit(request: Request, call_next):
     length = request.headers.get("content-length")
-    if length and int(length) > 1024 * 1024:
+    if length and int(length) > MAX_BODY_SIZE:
         return JSONResponse(status_code=413, content={"detail": "payload exceeds 1 MiB"})
     response = await call_next(request)
     return response

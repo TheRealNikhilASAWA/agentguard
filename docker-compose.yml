@@ -1,0 +1,21 @@
+services:
+  agentguard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      AGENTGUARD_AUDIT_PATH: /app/audit/audit.jsonl
+      AGENTGUARD_POLICY_PATH: /app/policy/default.yaml
+      AGENTGUARD_MAX_BODY_SIZE: 1048576
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - agentguard-audit:/app/audit
+
+volumes:
+  agentguard-audit:
