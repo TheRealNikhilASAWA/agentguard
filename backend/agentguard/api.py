@@ -4,11 +4,12 @@ from uuid import uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from . import __version__
 from .audit import append_entry, recent_entries
 from .engine import evaluate
+from .landing import LANDING_PAGE
 from .models import ToolCall
 from .policy import load_policy
 
@@ -35,6 +36,11 @@ async def validation_error(_: Request, exc: RequestValidationError):
 @app.get("/health")
 async def health():
     return {"status": "ok", "version": __version__}
+
+
+@app.get("/", response_class=HTMLResponse)
+async def landing_page():
+    return LANDING_PAGE
 
 
 @app.get("/decisions")

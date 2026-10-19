@@ -55,6 +55,19 @@ tmpfs, and a named audit volume:
 docker compose up --build
 ```
 
+### Free Render deployment
+
+This repository includes `render.yaml` for a free Render Docker web service.
+Create a new Render Blueprint from the repository and Render will use the
+existing `Dockerfile`, check `/health`, and provide the service `PORT` at
+runtime. The root page at `/` is a no-build-step demo landing page with four
+synthetic examples.
+
+The free instance sleeps when idle, so the first request after inactivity can
+take about 50 seconds. It has no authentication. Deploy it only for demos and
+send synthetic data; never send credentials, personal data, or production
+tool calls to the public instance.
+
 ## API contract
 
 `POST /tool-call` accepts:
@@ -153,6 +166,8 @@ requirements.txt          exact direct and transitive pins
   opens recorded paths, or makes tool network requests.
 - Only calls that pass through AgentGuard are protected. A tool or agent that
   bypasses the proxy is outside its control.
+- The demo deployment has no authentication and should receive synthetic data
+  only.
 - Audit entries are append-only JSONL, use a process lock, contain only
   redacted arguments, and hash the original argument object.
 - Audit and policy paths are configuration values; avoid putting secrets or

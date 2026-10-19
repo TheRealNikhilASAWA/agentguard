@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: agentguard
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: AGENTGUARD_AUDIT_PATH
+        value: /app/audit/audit.jsonl
+      - key: AGENTGUARD_POLICY_PATH
+        value: /app/policy/default.yaml
+      - key: AGENTGUARD_MAX_BODY_SIZE
+        value: "1048576"

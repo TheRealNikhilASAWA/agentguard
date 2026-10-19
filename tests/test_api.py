@@ -9,6 +9,24 @@ def test_health():
     assert response.status_code == 200 and response.json() == {"status": "ok", "version": "0.1.0"}
 
 
+def test_landing_page_has_demo_controls():
+    response = TestClient(app).get("/")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    page = response.text
+    assert "AgentGuard" in page
+    for label in ("Benign", "rm -rf /", "Path traversal", "Fake AWS key"):
+        assert label in page
+    assert 'fetch("/tool-call"' in page
+
+
+def test_landing_page_renders_results_as_text():
+    page = TestClient(app).get("/").text
+    assert "result.textContent" in page
+    assert "result.innerHTML" not in page
+    assert "<script src=" not in page
+
+
 def test_api_decision_and_audit(tmp_path, monkeypatch):
     monkeypatch.setenv("AGENTGUARD_AUDIT_PATH", str(tmp_path / "audit.jsonl"))
     client = TestClient(app)
