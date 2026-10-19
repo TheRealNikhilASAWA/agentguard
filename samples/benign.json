@@ -1,0 +1,7 @@
+[
+  {"tool": "read_file", "arguments": {"path": "/workspace/readme.txt"}},
+  {"tool": "write_file", "arguments": {"path": "/workspace/out.txt", "content": "hello"}},
+  {"tool": "bash_execute", "arguments": {"command": "ls -la"}},
+  {"tool": "http_request", "arguments": {"url": "https://api.example.test/v1"}},
+  {"tool": "db_query", "arguments": {"query": "select 1"}}
+]

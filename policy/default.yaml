@@ -1,0 +1,25 @@
+version: "1"
+workspace_root: "/workspace"
+allowed_tools:
+  read_file:
+    arguments: {path: path}
+  write_file:
+    arguments: {path: path, content: text}
+  bash_execute:
+    arguments: {command: command}
+  http_request:
+    arguments: {url: url, method: text}
+  db_query:
+    arguments: {query: text}
+allowed_hosts:
+  - api.example.test
+  - localhost
+protected_paths:
+  - "/workspace/.env"
+rules:
+  R001: {id: R001, enabled: true, severity: critical, description: "Block sensitive paths and workspace escapes"}
+  R002: {id: R002, enabled: true, severity: critical, description: "Block destructive commands"}
+  R003: {id: R003, enabled: true, severity: high, description: "Block download-to-shell execution"}
+  R004: {id: R004, enabled: true, severity: high, description: "Block unapproved network hosts"}
+  R005: {id: R005, enabled: true, severity: high, description: "Redact secrets"}
+  R006: {id: R006, enabled: true, severity: medium, description: "Redact personal information"}
