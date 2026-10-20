@@ -68,6 +68,13 @@ take about 50 seconds. It has no authentication. Deploy it only for demos and
 send synthetic data; never send credentials, personal data, or production
 tool calls to the public instance.
 
+The landing-page **Path traversal** example sends the path in percent-encoded
+form (`%2e%2e%2f%2e%2e%2fetc%2fpasswd`) instead of including the literal
+`../../etc/passwd` string in the request body. Some hosting proxies or edge
+filters reject that literal pattern before it reaches the app. AgentGuard's
+normalizer decodes the equivalent path before evaluating R001, so the example
+still returns `BLOCK` with rule `R001`; the policy and engine are unchanged.
+
 ## API contract
 
 `POST /tool-call` accepts:
@@ -131,7 +138,7 @@ Copy the file to a separately managed policy path and set
 
 ## Test and demo
 
-`make test` is the canonical test command. It runs the full offline suite (49
+`make test` is the canonical test command. It runs the full offline suite (53
 tests at the time of writing). `scripts/test.py` provides the same command
 without requiring Make.
 

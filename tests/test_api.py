@@ -27,6 +27,34 @@ def test_landing_page_renders_results_as_text():
     assert "<script src=" not in page
 
 
+def test_landing_page_checks_status_and_content_type_before_parsing():
+    page = TestClient(app).get("/").text
+    content_type_check = page.index('response.headers.get("content-type")')
+    status_check = page.index("if (!response.ok)")
+    json_parse = page.index("response.json()")
+    assert content_type_check < json_parse
+    assert status_check < json_parse
+    assert "Request rejected (HTTP ${response.status})" in page
+    assert "expected JSON but received" in page
+    assert "the server returned invalid JSON" in page
+    assert "result.textContent = String(error)" not in page
+
+
+def test_encoded_traversal_example_is_blocked_by_r001():
+    encoded_path = "%2e%2e%2f%2e%2e%2fetc%2fpasswd"
+    page = TestClient(app).get("/").text
+    assert encoded_path in page
+
+    response = TestClient(app).post(
+        "/tool-call",
+        json={"tool": "read_file", "arguments": {"path": encoded_path}},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["decision"] == "BLOCK"
+    assert response.json()["rule_id"] == "R001"
+
+
 def test_api_decision_and_audit(tmp_path, monkeypatch):
     monkeypatch.setenv("AGENTGUARD_AUDIT_PATH", str(tmp_path / "audit.jsonl"))
     client = TestClient(app)
