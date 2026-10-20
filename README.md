@@ -43,7 +43,7 @@ record, and returns the decision JSON. The three possible outcomes are:
 - **`BLOCK`** — the call is stopped and never forwarded.
 
 ## Try it in 30 seconds
-
+![AgentGuard Live Quickstart](docs/assets/live_demo.png)
 The public demo runs at
 [https://agentguard-tdob.onrender.com](https://agentguard-tdob.onrender.com).
 The free Render instance sleeps when idle, so the first request after
