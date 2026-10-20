@@ -180,6 +180,10 @@ requirements.txt          exact direct and transitive pins
 - Audit and policy paths are configuration values; avoid putting secrets or
   host-specific absolute paths in committed files.
 
+## License
+
+MIT © 2026 TheRealNikhilASAWA
+
 ## Known limitations
 
 Pattern-based rules cannot reliably detect every semantic attack, novel
