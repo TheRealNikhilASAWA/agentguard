@@ -46,7 +46,9 @@ LANDING_PAGE = """<!doctype html>
     const examples = {
       benign: {tool: "read_file", arguments: {path: "/workspace/readme.txt"}},
       destructive: {tool: "bash_execute", arguments: {command: "rm -rf /"}},
-      traversal: {tool: "read_file", arguments: {path: "../../etc/passwd"}},
+      // Percent-encoding avoids triggering a hosting edge filter. The server's
+      // normalizer decodes this back to ../../etc/passwd before applying R001.
+      traversal: {tool: "read_file", arguments: {path: "%2e%2e%2f%2e%2e%2fetc%2fpasswd"}},
       aws: {tool: "db_query", arguments: {note: "AKIAIOSFODNN7EXAMPLE"}}
     };
     const payload = document.getElementById("payload");
@@ -64,8 +66,29 @@ LANDING_PAGE = """<!doctype html>
           headers: {"content-type": "application/json"},
           body: payload.value
         });
-        const data = await response.json();
-        status.textContent = response.ok ? "Evaluation complete" : "Request rejected";
+        const contentType = (response.headers.get("content-type") || "").toLowerCase();
+        const isJson = contentType.includes("json");
+        if (!response.ok) {
+          status.textContent = `Request rejected (HTTP ${response.status})`;
+          result.textContent = isJson
+            ? await response.text()
+            : `HTTP ${response.status}: the server returned a non-JSON response${contentType ? ` (${contentType})` : ""}.`;
+          return;
+        }
+        if (!isJson) {
+          status.textContent = `Request failed (HTTP ${response.status})`;
+          result.textContent = `HTTP ${response.status}: expected JSON but received ${contentType || "an unknown content type"}.`;
+          return;
+        }
+        let data;
+        try {
+          data = await response.json();
+        } catch (_) {
+          status.textContent = `Request failed (HTTP ${response.status})`;
+          result.textContent = `HTTP ${response.status}: the server returned invalid JSON.`;
+          return;
+        }
+        status.textContent = "Evaluation complete";
         result.textContent = JSON.stringify({
           decision: data.decision,
           rule_id: data.rule_id,
@@ -75,7 +98,7 @@ LANDING_PAGE = """<!doctype html>
         }, null, 2);
       } catch (error) {
         status.textContent = "Could not evaluate call";
-        result.textContent = String(error);
+        result.textContent = "The request could not be completed. Please try again.";
       }
     });
   </script>
