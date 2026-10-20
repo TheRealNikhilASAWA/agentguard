@@ -68,6 +68,7 @@ curl -sS -X POST https://agentguard-tdob.onrender.com/tool-call \
 ```
 
 ### `REDACT_AND_FORWARD` — fake AWS key
+![AgentGuard Redaction Example](docs/assets/redact_demo.png)
 
 ```bash
 curl -sS -X POST https://agentguard-tdob.onrender.com/tool-call \
