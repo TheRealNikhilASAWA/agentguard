@@ -47,7 +47,7 @@ LANDING_PAGE = """<!doctype html>
       benign: {tool: "read_file", arguments: {path: "/workspace/readme.txt"}},
       destructive: {tool: "bash_execute", arguments: {command: "rm -rf /"}},
       // Percent-encoding avoids triggering a hosting edge filter. The server's
-      // normalizer decodes this back to ../../etc/passwd before applying R001.
+      // normalizer decodes this before applying R001.
       traversal: {tool: "read_file", arguments: {path: "%2e%2e%2f%2e%2e%2fetc%2fpasswd"}},
       aws: {tool: "db_query", arguments: {note: "AKIAIOSFODNN7EXAMPLE"}}
     };
