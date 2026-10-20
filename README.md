@@ -83,7 +83,7 @@ the inert local `make demo` client; the landing-page example uses an encoded
 equivalent that the normalizer decodes before applying R001.
 
 ## Try it in 60 seconds
-
+![AgentGuard Demo and Test Output](docs/assets/terminal_demo.png)
 1. Open the [live AgentGuard page](https://agentguard-tdob.onrender.com).
 2. Click all four landing-page examples: **Benign**, **rm -rf /**,
    **Path traversal**, and **Fake AWS key**.
